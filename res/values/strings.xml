@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">存量单证查阅</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="drawer_open">Slider Menu Opened</string>
+    <string name="drawer_close">Slider Menu Closed</string>
+    <string name="action_search">Search</string>
+
+    <!-- Content Description -->
+    <string name="desc_list_item_icon">Item Icon</string>
+    <string name="action_previous">Previous</string>
+    <string name="action_next">Next</string>
+    <string name="action_finish">Finish</string>
+    <string name="lorem_ipsum">This is a Test</string>
+    <string name="title_template_step">Step</string>
+    <string name="title_screen_slide">单据列表</string>
+    
+    <string name="menu_section_receipts">目录</string>
+    <string name="menu_section_action">操作菜单</string>
+    <string name="menu_item_logout">退出系统</string>
+    <string name="menu_item_title1">第</string>
+    <string name="menu_item_title2">页</string>
+    
+    <!-- Search use resources for hint & label -->
+    <string name="search_hint">请输入单证号</string>
+    <string name="search_label">Search</string>
+    <string name="search_global_description">Search</string>
+</resources>
