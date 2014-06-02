@@ -45,7 +45,7 @@ public class WebViewFragment extends Fragment {
     }
     
 	
-	OnTouchListener onTouchListener = new View.OnTouchListener() {
+	/*OnTouchListener onTouchListener = new View.OnTouchListener() {
 	    @Override
 	    public boolean onTouch(View v, MotionEvent event) {
 	    	Log.e("ERROR " , "******onTouchListener: event was trigger");
@@ -55,10 +55,10 @@ public class WebViewFragment extends Fragment {
 
 	        return false;
 	    }
-	};
+	};*/
 
 	
-	protected String[] getMenus () {
+	/*protected String[] getMenus () {
 		//sudo code needs hoops up with server to receive data;
 		String[] nameList = new String[6];
 
@@ -68,7 +68,7 @@ public class WebViewFragment extends Fragment {
         return nameList;
 		//end of sudo code
         
-	}
+	}*/
 	
 	
 
@@ -83,7 +83,7 @@ public class WebViewFragment extends Fragment {
 		//Log.e("Error", "*** position " + position);
 		// List of rivers
 		//String[] menus = getResources().getStringArray(R.array.menus);
-		String[] menus = getMenus();
+		//String[] menus = getMenus();
 
 		// Creating view corresponding to the fragment
 		View view = inflater.inflate(R.layout.fragment_layout, container, false);
@@ -95,32 +95,38 @@ public class WebViewFragment extends Fragment {
 		webView = (WebView)view.findViewById(R.id.webView); 
 		webView.setWebViewClient(new MyBrowser());
 		webView.loadUrl(currentURL);
-		webView.setOnTouchListener(onTouchListener);
-		webView.getSettings().setLoadWithOverviewMode(true);
-		webView.getSettings().setUseWideViewPort(true);
-		webView.getSettings().setMinimumFontSize(40);
-		webView.getSettings().setJavaScriptEnabled(true);
-		webView.getSettings().setSupportZoom(true);
-		webView.getSettings().setBuiltInZoomControls(true);
+		// webView.setOnTouchListener(onTouchListener);
+		WebSettings settings = webView.getSettings();
+		settings.setLoadWithOverviewMode(true);
+		settings.setUseWideViewPort(true);
+		settings.setMinimumFontSize(40);
+		settings.setJavaScriptEnabled(true);
+		settings.setSupportZoom(true);
+		settings.setBuiltInZoomControls(true);
 		webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
 		webView.setScrollbarFadingEnabled(true);
-		
+		// settings.setAppCacheMaxSize(8*1024*1024);
+		settings.setAppCachePath("/data/data/com.your.package.appname/cache");
+				settings.setAppCacheEnabled(true);
+		 		settings.setCacheMode(WebSettings.LOAD_DEFAULT);
 	    webView.setWebViewClient(new WebViewClient() {      
             //ProgressDialog progressDialog;
           
             //If you will not use this method url links are opeen in new brower not in webview
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {              
+            /*public boolean shouldOverrideUrlLoading(WebView view, String url) {              
                 view.loadUrl(url);
                 return true;
-            }
+            }*/
         
             //Show loader on url load
-            @Override
+            /*@Override
             public void onLoadResource (WebView view, String url) {
-            }
+            }*/
             
             @Override
             public void onPageFinished(WebView view, String url) {
+            	ScreenSlideActivity sa = (ScreenSlideActivity) WebViewFragment.this.getActivity();
+
             	int pos = url.indexOf("/docimages/");
                 if (pos != -1) {
                 	Log.e("ERROR", "**** Doc found");
@@ -129,10 +135,10 @@ public class WebViewFragment extends Fragment {
                 	Log.e("ERROR", "the uri is " + uri);
                 	String docId = uri.substring(0, uri.indexOf("/"));
                 	Log.e("ERROR", "the loaded DOCID is " + docId);
-                	ScreenSlideActivity sa = (ScreenSlideActivity) WebViewFragment.this.getActivity();
                 	sa.loadDocumentJson(docId);
                 } else {
                 	Log.e("ERROR", "**** Doc not found");
+                	sa.cleanup();
                 }
             }
              

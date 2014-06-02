@@ -19,6 +19,7 @@
     
     <string name="menu_section_receipts">目录</string>
     <string name="menu_section_action">操作菜单</string>
+    <string name="menu_item_setting">服务器设置</string>
     <string name="menu_item_logout">退出系统</string>
     <string name="menu_item_title1">第</string>
     <string name="menu_item_title2">页</string>
