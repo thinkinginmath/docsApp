@@ -58,30 +58,29 @@ public class ScreenSlideActivity extends FragmentActivity {
     
     // for drawer
     private DrawerLayout mDrawerLayout;
-	private ListView mDrawerList;
-	private ActionBarDrawerToggle mDrawerToggle;
-
-	// nav drawer title
-	private CharSequence mDrawerTitle;
-
-	// used to store app title
-	private CharSequence mTitle;
-
-	// slide menu items
-	private String[] navMenuTitles;
-	private TypedArray navMenuIcons;
-
-	private ArrayList<NavDrawerItem> navDrawerItems = new ArrayList<NavDrawerItem>();;
-	private ArrayList<HashMap<String, String>> receiptslist = new ArrayList<HashMap<String, String>>();
-	private NavDrawerListAdapter adapter;
-	
-	float x1, x2;
-	float y1, y2;
+    private ListView mDrawerList;
+    private ActionBarDrawerToggle mDrawerToggle;
+    
+    // nav drawer title
+    private CharSequence mDrawerTitle;
+    
+    // used to store app title
+    private CharSequence mTitle;
+    
+    // slide menu items
+    private String[] navMenuTitles;
+    private TypedArray navMenuIcons;
+    
+    private ArrayList<HashMap<String, String>> receiptslist = new ArrayList<HashMap<String, String>>();
+    private NavDrawerListAdapter adapter;
+    
+    float x1, x2;
+    float y1, y2;
 	//end of for drawer
 
-	public String searchID = null;
+    public String searchID = null;
 	
-	private static String url = "http://docs.blackberry.com/sampledata.json";
+    private static String url = "http://docs.blackberry.com/sampledata.json";
 	
     private static final String FILE_NAME = "FN";
     private static final String FILE_TYPE = "T";
@@ -91,9 +90,9 @@ public class ScreenSlideActivity extends FragmentActivity {
     
     public void loadDocumentJson(String docId) {
     	if (!jsonLoaded) {
-    		jsonLoaded = true;
-    		new ProgressTask(ScreenSlideActivity.this, docId).execute();
-        	createDrawer();
+	    jsonLoaded = true;
+	    new ProgressTask(ScreenSlideActivity.this, docId).execute();
+	    createDrawer();
     	}
     }
 
@@ -115,51 +114,46 @@ public class ScreenSlideActivity extends FragmentActivity {
     
     private void createDrawer()
     {
-		mTitle = mDrawerTitle = getTitle();
-		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-	    adapter = new NavDrawerListAdapter(getApplicationContext(), R.layout.drawer_list_item);
+	mTitle = mDrawerTitle = getTitle();
+	mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+	adapter = new NavDrawerListAdapter(getApplicationContext(), R.layout.drawer_list_item);
 	    		                 
-	    adapter.addSysMenu(NavMenuSection.create(100001,
-	    		 				getString(R.string.menu_section_action)));
+	adapter.addSysMenu(NavMenuSection.create(100001,
+						 getString(R.string.menu_section_action)));
 
-
-	    adapter.addSysMenu(NavMenuItem.create(100002,
-	    		           "  "+getString(R.string.menu_item_setting), "action", true,
-	                       this));
+	adapter.addSysMenu(NavMenuItem.create(100002,
+					      "  "+getString(R.string.menu_item_setting), "action", true,
+					      this));
 	    
-	    adapter.addSysMenu(NavMenuItem.create(100003,
-	    		           "  "+getString(R.string.menu_item_logout), "action", true,
-	    		           this));
-	    mDrawerList = (ListView) findViewById(R.id.list_slidermenu);
-	    
-	    mDrawerList.setAdapter(adapter.getArrayAdpater());
-	    
-	    mDrawerList.setOnItemClickListener(new SlideMenuClickListener());
+	adapter.addSysMenu(NavMenuItem.create(100003,
+					      "  "+getString(R.string.menu_item_logout), "action", true,
+					      this));
 
-		// enabling action bar app icon and behaving it as toggle button
-		getActionBar().setDisplayHomeAsUpEnabled(true);
-		//getActionBar().setHomeButtonEnabled(true);
+	mDrawerList = (ListView) findViewById(R.id.list_slidermenu);
+	mDrawerList.setAdapter(adapter.getArrayAdpater());	    
+	mDrawerList.setOnItemClickListener(new SlideMenuClickListener());
 
-		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-				R.drawable.ic_drawer, //nav menu toggle icon
-				R.string.app_name, // nav drawer open - description for accessibility
-				R.string.app_name // nav drawer close - description for accessibility
-		) {
-			public void onDrawerClosed(View view) {
-				getActionBar().setTitle(mTitle);
-				// calling onPrepareOptionsMenu() to show action bar icons
-				invalidateOptionsMenu();
-			}
+	getActionBar().setDisplayHomeAsUpEnabled(true);
 
-			public void onDrawerOpened(View drawerView) {
-				getActionBar().setTitle(mDrawerTitle);
-				// calling onPrepareOptionsMenu() to hide action bar icons
-				invalidateOptionsMenu();
-			}
-		};
-		mDrawerLayout.setDrawerListener(mDrawerToggle);
+	mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
+						  R.drawable.ic_drawer, //nav menu toggle icon
+						  R.string.app_name, // nav drawer open - description for accessibility
+						  R.string.app_name // nav drawer close - description for accessibility
+						  ) {
+		public void onDrawerClosed(View view) {
+		    getActionBar().setTitle(mTitle);
+		    // calling onPrepareOptionsMenu() to show action bar icons
+		    invalidateOptionsMenu();
+		}
+
+		public void onDrawerOpened(View drawerView) {
+		    getActionBar().setTitle(mDrawerTitle);
+		    // calling onPrepareOptionsMenu() to hide action bar icons
+		    invalidateOptionsMenu();
+		}
+	    };
+	mDrawerLayout.setDrawerListener(mDrawerToggle);
     }
-
     
     private class ProgressTask extends AsyncTask<String, Void, Boolean> {
     	private ProgressDialog dialog;
@@ -185,24 +179,25 @@ public class ScreenSlideActivity extends FragmentActivity {
 
     	@Override
     	protected void onPostExecute(final Boolean success) {
-    		if (dialog.isShowing()) {
-    			dialog.dismiss();
-    		}
-    		updateDrawerMenu();						 
+	    if (dialog.isShowing()) {
+		dialog.dismiss();
+	    }
+	    updateDrawerMenu();						 
     	}
     	
     	private JSONArray json;
     	private String docId;
+
     	private void updateDrawerMenu() {
 	    adapter.addPageMenuItem(NavMenuSection.create(100,
-				    getString(R.string.menu_section_receipts)));
+							  getString(R.string.menu_section_receipts)));
 
 	    for (int i = 0; i < json.length(); i++) {
 		try {
 		    JSONObject c = json.getJSONObject(i);
 		    int page = i + 1;
 		    String fileType = c.getString(FILE_TYPE);
-
+		    
 		    String title = getString(R.string.menu_item_title1) + page
 			+ getString(R.string.menu_item_title2)
 			+ " (" + fileType + ")";
@@ -292,23 +287,19 @@ public class ScreenSlideActivity extends FragmentActivity {
 		  jsonLoaded = false;		
 
 
-			/*	navDrawerItems.add(NavMenuItem.create(100001,
-						"  "+getString(R.string.menu_item_logout), "action", true,
-						ScreenSlideActivity.));
-				*/
-				searchID = query;
-				Log.e("searchID", "**** searchID is " + searchID);
-				if (searchID != null) {
-					//new ProgressTask(ScreenSlideActivity.this, query).execute();
-					mPager = (ViewPager) findViewById(R.id.pager);
-					Log.e("ScreenSlideActivity", "**** mPager is " + mPager);
-					if (mPagerAdapter == null) {
-						mPagerAdapter = new ScreenSlidePagerAdapter(
-								getSupportFragmentManager(), query);
-						mPager.setAdapter(mPagerAdapter);
-						mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-							@Override
-							public void onPageSelected(int position) {
+		  searchID = query;
+		  Log.e("searchID", "**** searchID is " + searchID);
+		  if (searchID != null) {
+		      //new ProgressTask(ScreenSlideActivity.this, query).execute();
+		      mPager = (ViewPager) findViewById(R.id.pager);
+		      Log.e("ScreenSlideActivity", "**** mPager is " + mPager);
+		      if (mPagerAdapter == null) {
+			  mPagerAdapter = new ScreenSlidePagerAdapter(
+								      getSupportFragmentManager(), query);
+			  mPager.setAdapter(mPagerAdapter);
+			  mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+				  @Override
+				  public void onPageSelected(int position) {
 								// When changing pages, reset the action bar actions since
 								// they are dependent
 								// on which page is currently active. An alternative
@@ -317,44 +308,29 @@ public class ScreenSlideActivity extends FragmentActivity {
 								// exposing actions),
 								// but for simplicity, the activity provides the actions in
 								// this sample.
-								invalidateOptionsMenu();
-							}
-						});
-
-					}
+				      invalidateOptionsMenu();
+				  }
+			      });
+			  
+		      }
 					//		
 					// Add any number of items to the list of your Fragment
 
 //					mPagerAdapter.searchDoc(query);
-					Log.e("ERROR", "***set current item");
-					mPager.setCurrentItem(0);
-					mPagerAdapter.searhDoc(query);
-					
-					
-		        }
+		      Log.e("ERROR", "***set current item");
+		      mPager.setCurrentItem(0);
+		      mPagerAdapter.searhDoc(query);
+		  }
 				
-				return true;
-			}
+		  return true;
+	      }
 
-			// @Override
-			public boolean onQueryTextChange(String text) {
-				return true;
-			}
-		});
+	      // @Override
+	      public boolean onQueryTextChange(String text) {
+		  return true;
+	      }
+	  });
         
-      //This is set on the menu item
-       /* search.setOnActionExpandListener(new OnActionExpandListener() {
-                //@Override
-                public boolean onMenuItemActionCollapse(MenuItem item) {
-                    // Do something when collapsed
-                    return true;       // Return true to collapse action view
-                }
-                //@Override
-                public boolean onMenuItemActionExpand(MenuItem item) {
-                	receipt_search.setQuery(searchID, false);
-                    return true;      // Return true to expand action view
-                }
-            });*/
         return true;
     }
 
@@ -363,15 +339,15 @@ public class ScreenSlideActivity extends FragmentActivity {
     	if (searchID == null)
     		return false;
     	if (mDrawerToggle.onOptionsItemSelected(item)) {
-			return true;
-		}
+	    return true;
+	}
         switch (item.getItemId()) {
-            case android.R.id.home:
-                // Navigate "up" the demo structure to the launchpad activity.
-                // See http://developer.android.com/design/patterns/navigation.html for more.
-                NavUtils.navigateUpTo(this, new Intent(this, LoginActivity.class));
-                return true;
-
+	case android.R.id.home:
+	    // Navigate "up" the demo structure to the launchpad activity.
+	    // See http://developer.android.com/design/patterns/navigation.html for more.
+	    NavUtils.navigateUpTo(this, new Intent(this, LoginActivity.class));
+	    return true;
+	    
            // case R.id.action_previous:
                 // Go to the previous step in the wizard. If there is no previous step,
                 // setCurrentItem will do nothing.
@@ -384,74 +360,55 @@ public class ScreenSlideActivity extends FragmentActivity {
               //  mPager.setCurrentItem(mPager.getCurrentItem() + 1);
                // return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
-    
-    
-    /*public boolean onPrepareOptionsMenu(Menu menu) {
-		// if nav drawer is opened, hide the action items
-		boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
-		
-		Log.e("ERROR", "****mDrawerList " + mDrawerList);
-		if (mDrawerList != null)
-		{
-			Log.e("ERROR", "****mDrawerList size " + mDrawerList.getCount());
-		}
-		Log.e("ERROR", "****menu ) " + menu);
-		Log.e("ERROR", "****menu find item) " + menu.findItem(R.id.action_settings));
-		menu.findItem(R.id.action_settings).setVisible(!drawerOpen);
-		return super.onPrepareOptionsMenu(menu);
-    }*/
+    /**
+     * Diplaying fragment view for selected nav drawer list item
+     * */
+    private void displayView(int position) {
+	// update the main content by replacing fragments
+	// Getting an array of rivers
+	//String[] menuItems = getResources().getStringArray(R.array.menus);
+	//String[] menuItems = getMenus(position);
+	NavDrawerItem item = adapter.getNthItem(position);
+	
+	// Currently selected river
+	//mTitle = menuItems[position];
+	
+	if (mPager != null) {
+	    mPager.setCurrentItem(position);
+	}
+	// Creating a fragment object
+	
+	// update selected item and title, then close the drawer
+	mDrawerList.setItemChecked(position, true);
+	mDrawerList.setSelection(position);
+	if (item) {
+	    setTitle(item.getLabel());
+	}
+	mDrawerLayout.closeDrawer(mDrawerList);
+    }
 
     /**
-	 * Diplaying fragment view for selected nav drawer list item
-	 * */
-	private void displayView(int position) {
-		// update the main content by replacing fragments
-		// Getting an array of rivers
-		//String[] menuItems = getResources().getStringArray(R.array.menus);
-		//String[] menuItems = getMenus(position);
-		NavDrawerItem item = navDrawerItems.get(position);
-		
-		// Currently selected river
-		//mTitle = menuItems[position];
-		
-		if (mPager != null)
-		{
-		    mPager.setCurrentItem(position);
-		}
-		// Creating a fragment object
-
-			// update selected item and title, then close the drawer
-			mDrawerList.setItemChecked(position, true);
-			mDrawerList.setSelection(position);
-			setTitle(item.getLabel());
-			mDrawerLayout.closeDrawer(mDrawerList);
-		
-	}
-
-	/**
-	 * Slide menu item click listener
-	 * */
-	private class SlideMenuClickListener implements
-			ListView.OnItemClickListener {
-		@Override
-		public void onItemClick(AdapterView<?> parent, View view, int position,
+     * Slide menu item click listener
+     * */
+    private class SlideMenuClickListener implements ListView.OnItemClickListener {
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position,
 				long id) {
-			// display view for selected nav drawer item
-			    Log.e("EEEOR", "*** postion is " +position);
-				if (position+1 == mDrawerList.getCount()){
-					NavUtils.navigateUpTo(currentActivity,
-							new Intent(view.getContext(), LoginActivity.class));
-					
-				}
-				else {
-					displayView(position);
-				}
-			
-			}
-		}
+	    // display view for selected nav drawer item
+	    Log.e("EEEOR", "*** postion is " +position);
+	    if (position+1 == mDrawerList.getCount()){
+		NavUtils.navigateUpTo(currentActivity,
+				      new Intent(view.getContext(), LoginActivity.class));
+		
+	    }
+	    else {
+		displayView(position);
+	    }
+	    
 	}
+    }
+}
 

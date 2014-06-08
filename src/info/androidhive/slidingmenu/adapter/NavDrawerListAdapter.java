@@ -64,6 +64,17 @@ public class NavDrawerListAdapter {
     public void addPageMenuItem(NavDrawerItem item) {
     	pageObjects.add(item);
     }
+
+    public NavDrawerItem getNthItem(int n) {
+	menuSize = sysMenuObjects.size();
+	    
+	if (n < menuSize) {
+	    return sysMenuObjects.get(n);
+	}
+
+	return pageObjects.get(n-menuSize);
+    }
+    
     public NavDrawerListAdapter(Context context, int textViewResourceId) {
         sysMenuObjects = new ArrayList<NavDrawerItem>();
         pageObjects = new ArrayList<NavDrawerItem>();
