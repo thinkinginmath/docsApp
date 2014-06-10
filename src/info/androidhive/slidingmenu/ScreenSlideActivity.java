@@ -284,8 +284,11 @@ public class ScreenSlideActivity extends FragmentActivity {
       searchView.setOnQueryTextListener(new OnQueryTextListener() {
 	      @Override
 	      public boolean onQueryTextSubmit(String query) {
+		  searchView.clearFocus();
+		  InputMethodManager in = (InputMethodManager)currentActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+		  in.hideSoftInputFromWindow( searchView.getWindowToken(), 0);
+			    
 		  jsonLoaded = false;		
-
 
 		  searchID = query;
 		  Log.e("searchID", "**** searchID is " + searchID);
