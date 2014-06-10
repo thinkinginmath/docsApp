@@ -66,7 +66,7 @@ public class NavDrawerListAdapter {
     }
 
     public NavDrawerItem getNthItem(int n) {
-	menuSize = sysMenuObjects.size();
+	   int menuSize = sysMenuObjects.size();
 	    
 	if (n < menuSize) {
 	    return sysMenuObjects.get(n);

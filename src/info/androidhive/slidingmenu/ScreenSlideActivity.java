@@ -2,9 +2,11 @@ package info.androidhive.slidingmenu;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -27,6 +29,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SearchView;
@@ -86,6 +89,8 @@ public class ScreenSlideActivity extends FragmentActivity {
     private static final String FILE_TYPE = "T";
     
     private FragmentActivity currentActivity = this;
+    private SearchView searchView;
+
     private boolean jsonLoaded = false;
     
     public void loadDocumentJson(String docId) {
@@ -268,7 +273,7 @@ public class ScreenSlideActivity extends FragmentActivity {
         
         MenuItem searchItem = menu.findItem(R.id.action_search);
         
-        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView = (SearchView) searchItem.getActionView();
 
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
@@ -387,7 +392,7 @@ public class ScreenSlideActivity extends FragmentActivity {
 	// update selected item and title, then close the drawer
 	mDrawerList.setItemChecked(position, true);
 	mDrawerList.setSelection(position);
-	if (item) {
+	if (item != null) {
 	    setTitle(item.getLabel());
 	}
 	mDrawerLayout.closeDrawer(mDrawerList);
