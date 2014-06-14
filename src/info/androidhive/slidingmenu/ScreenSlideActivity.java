@@ -83,7 +83,6 @@ public class ScreenSlideActivity extends FragmentActivity {
 
     public String searchID = null;
 	
-    private static String url = "http://docs.blackberry.com/sampledata.json";
 	
     private static final String FILE_NAME = "FN";
     private static final String FILE_TYPE = "T";
@@ -97,7 +96,7 @@ public class ScreenSlideActivity extends FragmentActivity {
     	if (!jsonLoaded) {
 	    jsonLoaded = true;
 	    new ProgressTask(ScreenSlideActivity.this, docId).execute();
-	    createDrawer();
+	      // createDrawer();
     	}
     }
 
