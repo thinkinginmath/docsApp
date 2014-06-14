@@ -23,6 +23,10 @@
     <string name="menu_item_logout">退出系统</string>
     <string name="menu_item_title1">第</string>
     <string name="menu_item_title2">页</string>
+    <string name="menu_item_server">服务器地址</string>
+    <string name="menu_item_default_server">http://api.uubright.com</string>
+    <string name="menu_item_ok">设置</string>
+    <string name="menu_item_cancel">取消</string>
     
     <!-- Search use resources for hint & label -->
     <string name="search_hint">请输入单证号</string>

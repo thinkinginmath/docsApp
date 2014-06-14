@@ -63,6 +63,7 @@ public class NavDrawerListAdapter {
     }
     public void addPageMenuItem(NavDrawerItem item) {
     	pageObjects.add(item);
+    	arrayAdapter.notifyDataSetChanged();
     }
 
     public NavDrawerItem getNthItem(int n) {

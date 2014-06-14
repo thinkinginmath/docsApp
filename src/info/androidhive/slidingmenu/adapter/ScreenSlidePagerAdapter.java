@@ -52,7 +52,7 @@ public class ScreenSlidePagerAdapter extends FragmentPagerAdapter {
         //myFragment.setArguments(args);
 
         synchronized (this) {
-        	this.fragments.add(myFragment);
+	    this.fragments.add(myFragment);
             this.titles.add(title);
         }
         this.notifyDataSetChanged();

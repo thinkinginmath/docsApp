@@ -7,8 +7,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import info.androidhive.slidingmenu.Parser.JSONParser;
 import info.androidhive.slidingmenu.adapter.NavDrawerListAdapter;
@@ -22,15 +25,18 @@ import android.app.SearchManager;
 import android.content.Intent;
 import android.content.res.TypedArray;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.text.Editable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SearchView.OnQueryTextListener;
@@ -83,7 +89,7 @@ public class ScreenSlideActivity extends FragmentActivity {
 
     public String searchID = null;
 	
-    private static String url = "http://docs.blackberry.com/sampledata.json";
+    //private static String url = "http://docs.blackberry.com/sampledata.json";
 	
     private static final String FILE_NAME = "FN";
     private static final String FILE_TYPE = "T";
@@ -92,6 +98,12 @@ public class ScreenSlideActivity extends FragmentActivity {
     private SearchView searchView;
 
     private boolean jsonLoaded = false;
+    
+    private final String DEFAULT_SERVER = "http://api.uubright.com";
+    
+    private String serverURL = DEFAULT_SERVER;
+    
+    SharedPreferences preferences = null;
     
     public void loadDocumentJson(String docId) {
     	if (!jsonLoaded) {
@@ -112,9 +124,14 @@ public class ScreenSlideActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_screen_slide);
-        
+        retrieveServerURL();
         createDrawer();
         //mDrawerList = (ListView) findViewById(R.id.list_slidermenu);
+    }
+    
+    private void retrieveServerURL() {
+    	preferences = PreferenceManager.getDefaultSharedPreferences(currentActivity);
+    	serverURL = preferences.getString("serverURL", DEFAULT_SERVER); 	
     }
     
     private void createDrawer()
@@ -207,7 +224,7 @@ public class ScreenSlideActivity extends FragmentActivity {
 			+ getString(R.string.menu_item_title2)
 			+ " (" + fileType + ")";
                      
-		    mPagerAdapter.addItem("http://api.uubright.com/docimages/" + docId + "/" + c.getString("FN"),
+		    mPagerAdapter.addItem(serverURL+"/docimages/" + docId + "/" + c.getString("FN"),
 					  title);
                      
 		    String fileName = c.getString(FILE_NAME);
@@ -348,12 +365,14 @@ public class ScreenSlideActivity extends FragmentActivity {
     		return false;
     	if (mDrawerToggle.onOptionsItemSelected(item)) {
 	    return true;
-	}
+    	}
+    	Log.e("ERROR", "**** touched home1");
         switch (item.getItemId()) {
 	case android.R.id.home:
+		Log.e("ERROR", "**** touched home");
 	    // Navigate "up" the demo structure to the launchpad activity.
 	    // See http://developer.android.com/design/patterns/navigation.html for more.
-	    NavUtils.navigateUpTo(this, new Intent(this, LoginActivity.class));
+	    //NavUtils.navigateUpTo(this, new Intent(this, LoginActivity.class));
 	    return true;
 	    
            // case R.id.action_previous:
@@ -407,13 +426,40 @@ public class ScreenSlideActivity extends FragmentActivity {
 				long id) {
 	    // display view for selected nav drawer item
 	    Log.e("EEEOR", "*** postion is " +position);
-	    if (position+1 == mDrawerList.getCount()){
-		NavUtils.navigateUpTo(currentActivity,
+	    if (position == 1){
+	    	// Set an EditText view to get user input 
+	    	final EditText input = new EditText(currentActivity);
+            input.setText(serverURL);
+	    	new AlertDialog.Builder(currentActivity)
+	    	    .setTitle(R.string.menu_item_setting)
+	    	    .setMessage(getString(R.string.menu_item_server))
+	    	    .setView(input)
+	    	    .setPositiveButton(getString(R.string.menu_item_ok), new DialogInterface.OnClickListener() {
+	    	         public void onClick(DialogInterface dialog, int whichButton) {
+	    	        	 serverURL  = input.getText().toString(); 
+	    	        	 Log.e("ERROR", "*** serverURL " + serverURL);
+	    	        	 SharedPreferences.Editor editor = preferences.edit();
+	    	        	 editor.putString("serverURL", serverURL); // value to store
+	    	        	 editor.commit();
+	    	             // deal with the editable
+	    	         }
+	    	    })
+	    	    .setNegativeButton(getString(R.string.menu_item_cancel), new DialogInterface.OnClickListener() {
+	    	         public void onClick(DialogInterface dialog, int whichButton) {
+	    	                // Do nothing.
+	    	         }
+	    	    }).show();
+		
+	    }
+	    if (position == 2){
+	    	
+		    NavUtils.navigateUpTo(currentActivity,
 				      new Intent(view.getContext(), LoginActivity.class));
+		    
 		
 	    }
 	    else {
-		displayView(position);
+		    displayView(position);
 	    }
 	    
 	}

@@ -36,6 +36,17 @@ public class LoginActivity extends Activity {
         startWebView("http://api.uubright.com/llogin.html");
 		
     }
+    
+    @Override
+    public void onResume(){
+        Log.e("ERROR", "***onResuem gets called");
+        // put your code here...
+    	if (webView != null) {
+    	    webView.loadUrl("http://api.uubright.com/llogin.html");
+    	}
+       super.onResume();
+    }
+    	
      
     private void startWebView(String url) {
          
