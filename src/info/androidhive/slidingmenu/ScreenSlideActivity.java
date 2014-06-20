@@ -98,7 +98,7 @@ public class ScreenSlideActivity extends FragmentActivity {
 
     private boolean jsonLoaded = false;
     
-    private final String DEFAULT_SERVER = "http://api.uubright.com";
+    private final String DEFAULT_SERVER = "http://13.141.43.227";
     
     private String serverURL = DEFAULT_SERVER;
     
@@ -122,15 +122,23 @@ public class ScreenSlideActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+      	Log.e("test", "onCreate");
+        
         setContentView(R.layout.activity_screen_slide);
         retrieveServerURL();
         createDrawer();
+		  processSearchDocId();
+
         //mDrawerList = (ListView) findViewById(R.id.list_slidermenu);
     }
     
     private void retrieveServerURL() {
+    	Log.e("test", "retriveServerURL");
     	preferences = PreferenceManager.getDefaultSharedPreferences(currentActivity);
-    	serverURL = preferences.getString("serverURL", DEFAULT_SERVER); 	
+    	serverURL = preferences.getString("serverURL", DEFAULT_SERVER); 
+    	searchID = preferences.getString("docId", "test");
+      	Log.e("test", "retriveServerURL id" + searchID);
+        
     }
     
     private void createDrawer()
@@ -223,7 +231,7 @@ public class ScreenSlideActivity extends FragmentActivity {
 			+ getString(R.string.menu_item_title2)
 			+ " (" + fileType + ")";
                      
-		    mPagerAdapter.addItem(serverURL+"/docimages/" + docId + "/" + c.getString("FN"),
+		    mPagerAdapter.addItem(serverURL+"/docimages/" + docId + "/" + docId + "/" + c.getString("FN"),
 					  title);
                      
 		    String fileName = c.getString(FILE_NAME);
@@ -254,8 +262,8 @@ public class ScreenSlideActivity extends FragmentActivity {
 		
 		// get JSON data from URL
 		try {
-		    JSONObject jsonObj = jParser.getJSONFromUrl("http://api.uubright.com/docimages/" + docId + "/"
-								+ docId + ".json");
+		    JSONObject jsonObj = jParser.getJSONFromUrl("http://13.141.43.227/docimages/" + docId + "/"
+								+ docId + "/" + docId + ".json");
 		    json = jsonObj.getJSONArray("T_blog");
 					
 		    //JSONObject obj = new JSONObject(loadJSONFromAsset());
@@ -271,7 +279,42 @@ public class ScreenSlideActivity extends FragmentActivity {
 	    return null;
     	}
     }
+    
+    void processSearchDocId() {
+    if (searchID != null) {
+	      //new ProgressTask(ScreenSlideActivity.this, query).execute();
+	      mPager = (ViewPager) findViewById(R.id.pager);
+	      Log.e("ScreenSlideActivity", "**** mPager is " + mPager);
+	      if (mPagerAdapter == null) {
+		  mPagerAdapter = new ScreenSlidePagerAdapter(
+							      getSupportFragmentManager(), searchID);
+		  mPager.setAdapter(mPagerAdapter);
+		  mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+			  @Override
+			  public void onPageSelected(int position) {
+							// When changing pages, reset the action bar actions since
+							// they are dependent
+							// on which page is currently active. An alternative
+							// approach is to have each
+							// fragment expose actions itself (rather than the activity
+							// exposing actions),
+							// but for simplicity, the activity provides the actions in
+							// this sample.
+			      invalidateOptionsMenu();
+			  }
+		      });
+		  
+	      }
+				//		
+				// Add any number of items to the list of your Fragment
 
+//				mPagerAdapter.searchDoc(query);
+	      Log.e("ERROR", "***set current item");
+	      mPager.setCurrentItem(0);
+	      mPagerAdapter.searhDoc(searchID);
+	  }
+    }
+    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -313,39 +356,7 @@ public class ScreenSlideActivity extends FragmentActivity {
 
 		  searchID = query;
 		  Log.e("searchID", "**** searchID is " + searchID);
-		  if (searchID != null) {
-		      //new ProgressTask(ScreenSlideActivity.this, query).execute();
-		      mPager = (ViewPager) findViewById(R.id.pager);
-		      Log.e("ScreenSlideActivity", "**** mPager is " + mPager);
-		      if (mPagerAdapter == null) {
-			  mPagerAdapter = new ScreenSlidePagerAdapter(
-								      getSupportFragmentManager(), query);
-			  mPager.setAdapter(mPagerAdapter);
-			  mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-				  @Override
-				  public void onPageSelected(int position) {
-								// When changing pages, reset the action bar actions since
-								// they are dependent
-								// on which page is currently active. An alternative
-								// approach is to have each
-								// fragment expose actions itself (rather than the activity
-								// exposing actions),
-								// but for simplicity, the activity provides the actions in
-								// this sample.
-				      invalidateOptionsMenu();
-				  }
-			      });
-			  
-		      }
-					//		
-					// Add any number of items to the list of your Fragment
-
-//					mPagerAdapter.searchDoc(query);
-		      Log.e("ERROR", "***set current item");
-		      mPager.setCurrentItem(0);
-		      mPagerAdapter.searhDoc(query);
-		  }
-				
+		  processSearchDocId();
 		  return true;
 	      }
 

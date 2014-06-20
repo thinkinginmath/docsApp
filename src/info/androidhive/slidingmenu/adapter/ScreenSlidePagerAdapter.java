@@ -25,6 +25,7 @@ public class ScreenSlidePagerAdapter extends FragmentPagerAdapter {
 
      private List<String> titles;
      private WebViewFragment searchPage;
+     String docId;
      //private boolean firstTime;
      public ScreenSlidePagerAdapter(android.support.v4.app.FragmentManager fm, String docId) {
         super(fm);
@@ -33,11 +34,11 @@ public class ScreenSlidePagerAdapter extends FragmentPagerAdapter {
 
         this.titles    = new ArrayList<String>();
         searchPage = new WebViewFragment();
-		searchPage.init("http://api.uubright.com/msearch/" + docId );
+	searchPage.init("http://13.141.43.227/docs/" + docId, docId);
 
         //firstTime = false;
         //Log.e("ERROR", "***myFragment docID Search " +docId);
-        
+        this.docId = docId;
     }
     public void addItem(String url, String title) {
         
@@ -45,7 +46,7 @@ public class ScreenSlidePagerAdapter extends FragmentPagerAdapter {
         Log.e("ERROR", "***myFragment " +myFragment);
         //Bundle args = new Bundle();
 
-        myFragment.init(url);
+        myFragment.init(url, docId);
         
         //args.putString("url", url);
 
@@ -62,7 +63,7 @@ public class ScreenSlidePagerAdapter extends FragmentPagerAdapter {
        this.fragments.clear(); 
        this.titles.clear();
        this.notifyDataSetChanged();
-       searchPage.updateUrl("http://api.uubright.com/msearch/" + docId);
+       searchPage.updateUrl("http://13.141.43.227/docs/" + docId);
     }
 
 

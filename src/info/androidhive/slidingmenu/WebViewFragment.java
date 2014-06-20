@@ -23,11 +23,12 @@ public class WebViewFragment extends Fragment {
 	float y1, y2;
 	WebView webView;
 	
-	
+    String docId;
     private String currentURL;
     
-    public void init(String url) {
+    public void init(String url, String docId) {
         currentURL = url;
+	this.docId = docId;
     }
     
     @Override
@@ -40,7 +41,8 @@ public class WebViewFragment extends Fragment {
         Log.d("SwA", "Update URL ["+url+"] - View ["+getView()+"]");
         currentURL = url;
 
-        webView.loadUrl(url);
+        if (webView!= null)
+        	webView.loadUrl(url);
 		
     }
     
@@ -131,10 +133,10 @@ public class WebViewFragment extends Fragment {
                 if (pos != -1) {
                 	Log.e("ERROR", "**** Doc found");
                 	// Load JSON file.
-                	String uri = url.substring(pos + 11);
-                	Log.e("ERROR", "the uri is " + uri);
-                	String docId = uri.substring(0, uri.indexOf("/"));
-                	Log.e("ERROR", "the loaded DOCID is " + docId);
+                	//String uri = url.substring(pos + 11);
+                	Log.e("ERROR", "********** trying to load json  " + docId);
+                	//String docId = uri.substring(0, uri.indexOf("/"));
+                	//Log.e("ERROR", "the loaded DOCID is " + docId);
                 	sa.loadDocumentJson(docId);
                 } else {
                 	Log.e("ERROR", "**** Doc not found");

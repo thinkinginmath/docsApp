@@ -1,12 +1,13 @@
 package info.androidhive.slidingmenu;
 
 import android.annotation.SuppressLint;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -30,10 +31,11 @@ public class LoginActivity extends Activity {
 		//webView.getSettings().setJavaScriptEnabled(true);
 		webView.getSettings().setSupportZoom(true);
 		webView.getSettings().setBuiltInZoomControls(true);
+		webView.getSettings().setJavaScriptEnabled(true);
 		
          
        // startWebView("http://api.uubright.com/2225/pic000000.jpg");
-        startWebView("http://api.uubright.com/llogin.html");
+        startWebView("http://13.141.43.227/m/login.html");
 		
     }
     
@@ -42,7 +44,7 @@ public class LoginActivity extends Activity {
         Log.e("ERROR", "***onResuem gets called");
         // put your code here...
     	if (webView != null) {
-    	    webView.loadUrl("http://api.uubright.com/llogin.html");
+    	    webView.loadUrl("http://13.141.43.227/m/login.html");
     	}
        super.onResume();
     }
@@ -70,15 +72,22 @@ public class LoginActivity extends Activity {
                     progressDialog.setMessage("Loading...");
                     //startActivity(new Intent(LoginActivity.this, MainActivity.class));
 
-                    progressDialog.show();
+                    //progressDialog.show();
                 }
             }
             public void onPageFinished(WebView view, String url) {
+            	Log.e("Debugging", "callback for Page FInished ...." + url);
                 try{
-                if (progressDialog.isShowing()) {
+                if (progressDialog != null) {
                     progressDialog.dismiss();
                     progressDialog = null;
-                    if (url.indexOf("/login.html") > 0){
+                    if (url.indexOf("/docimages/") > 0){
+			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
+			SharedPreferences.Editor editor = preferences.edit();
+			editor.putString("docUrl", url);
+			editor.putString("docId", "220120131010090661");
+			editor.commit();
+
                     	startActivity(new Intent(LoginActivity.this, ScreenSlideActivity.class));
                         //startActivity(new Intent(LoginActivity.this, MainActivity.class));
                     }
