@@ -104,6 +104,40 @@ public class ScreenSlideActivity extends FragmentActivity {
     
     SharedPreferences preferences = null;
     
+    private String loginUrl;
+    private String logoutUrl;
+    private String homePageUrl;
+    private String server;
+
+    private void setServer(String server, boolean write) {
+	this.server = server;
+	String urlBase = "http://" + server;
+	loginUrl = urlBase + "/m/login.html";
+	logoutUrl = urlBase + "/m/logout";
+	homePageUrl = urlBase + "/pad/pad.html";
+
+	if (write) {
+	    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+	    SharedPreferences.Editor editor = preferences.edit();
+	    editor.putString("dms.server", server);
+	    editor.commit();
+	}
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+      	Log.e("test", "onCreate");
+        
+        setContentView(R.layout.activity_screen_slide);
+
+        createDrawer();
+        retrieveServerURL();
+	processSearchDocId();
+
+        //mDrawerList = (ListView) findViewById(R.id.list_slidermenu);
+    }
+    
     public void loadDocumentJson(String docId) {
     	if (!jsonLoaded) {
 	    jsonLoaded = true;
@@ -119,24 +153,11 @@ public class ScreenSlideActivity extends FragmentActivity {
         }
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-      	Log.e("test", "onCreate");
-        
-        setContentView(R.layout.activity_screen_slide);
-        retrieveServerURL();
-        createDrawer();
-		  processSearchDocId();
-
-        //mDrawerList = (ListView) findViewById(R.id.list_slidermenu);
-    }
-    
     private void retrieveServerURL() {
     	Log.e("test", "retriveServerURL");
     	preferences = PreferenceManager.getDefaultSharedPreferences(currentActivity);
-    	serverURL = preferences.getString("serverURL", DEFAULT_SERVER); 
-    	searchID = preferences.getString("docId", "test");
+    	server = preferences.getString("dms.server", DEFAULT_SERVER); 
+    	searchID = preferences.getString("dms.docId", "test");
       	Log.e("test", "retriveServerURL id" + searchID);
         
     }
@@ -151,10 +172,13 @@ public class ScreenSlideActivity extends FragmentActivity {
 						 getString(R.string.menu_section_action)));
 
 	adapter.addSysMenu(NavMenuItem.create(100002,
+					      "  "+getString(R.string.menu_item_homepage), "action", true,
+					      this));
+	adapter.addSysMenu(NavMenuItem.create(100003,
 					      "  "+getString(R.string.menu_item_setting), "action", true,
 					      this));
 	    
-	adapter.addSysMenu(NavMenuItem.create(100003,
+	adapter.addSysMenu(NavMenuItem.create(100004,
 					      "  "+getString(R.string.menu_item_logout), "action", true,
 					      this));
 
@@ -434,8 +458,18 @@ public class ScreenSlideActivity extends FragmentActivity {
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 				long id) {
+
+	    NavDrawerItem item = adapter.getNthItem(position);
+
+	    if (item == null) {
+		return;
+	    }
+	    String itemLabel = item.getLabel();
+
 	    // display view for selected nav drawer item
-	    Log.e("EEEOR", "*** postion is " +position);
+	    Log.e("EEEOR", "*** postion is " +position + "view:" + itemLabel);
+
+	    //Log.e("EEEOR", "*** postion object is " + t);
 	    if (position == 1){
 	    	// Set an EditText view to get user input 
 	    	final EditText input = new EditText(currentActivity);
@@ -463,7 +497,7 @@ public class ScreenSlideActivity extends FragmentActivity {
 	    }
 	    if (position == 2){
 	    	
-		    NavUtils.navigateUpTo(currentActivity,
+		NavUtils.navigateUpTo(currentActivity,
 				      new Intent(view.getContext(), LoginActivity.class));
 		    
 		
