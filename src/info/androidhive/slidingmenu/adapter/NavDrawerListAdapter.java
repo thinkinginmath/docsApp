@@ -54,8 +54,14 @@ public class NavDrawerListAdapter {
     	return arrayAdapter;
     }
     
+    public void resetPageMenuItems(String menuSectionText) {
+	clearPageMenuItems();
+	addPageMenuItem(NavMenuSection.create(100000,menuSectionText));
+    }
+
     public void clearPageMenuItems() {
     	pageObjects.clear();
+    	arrayAdapter.notifyDataSetChanged();
     }
 
     public void addSysMenu(NavDrawerItem item) {

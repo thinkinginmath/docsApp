@@ -21,32 +21,56 @@ import android.util.Log;
  * sequence.
  */
 public class ScreenSlidePagerAdapter extends FragmentPagerAdapter {
-	 private List<Fragment> fragments;
+    private List<Fragment> fragments;
 
-     private List<String> titles;
-     private WebViewFragment searchPage;
-     String docId;
+    private List<String> titles;
+    
+    private WebViewFragment searchPage;
+
+    String docId;
+    String searchUrl;
+    String searchPageTitle;
      //private boolean firstTime;
-     public ScreenSlidePagerAdapter(android.support.v4.app.FragmentManager fm, String docId) {
+    public ScreenSlidePagerAdapter(android.support.v4.app.FragmentManager fm,
+				   String searchUrl,
+				   String docId) {
         super(fm);
         //firstTime = true;
+	this.searchUrl = searchUrl;
         this.fragments = new ArrayList<Fragment>();
 
         this.titles    = new ArrayList<String>();
         searchPage = new WebViewFragment();
-	searchPage.init("http://13.141.43.227/docs/" + docId, docId);
+        searchPage.init(searchUrl + docId, docId, true);
 
         //firstTime = false;
         //Log.e("ERROR", "***myFragment docID Search " +docId);
         this.docId = docId;
     }
+
+    public String getTitleForPosition(int position) {
+	if (position == 0) {
+	    return searchPageTitle;
+	}
+	position = position - 1;
+	if (position < this.titles.size()) {
+	    return this.titles.get(position);
+	}
+	return "";
+    }
+    public void setSearchPageTitle(String title) {
+	searchPage.setTitle(title);
+	searchPageTitle = title;
+    }
     public void addItem(String url, String title) {
         
         WebViewFragment myFragment = new WebViewFragment();
-        Log.e("ERROR", "***myFragment " +myFragment);
+        myFragment.init(url, docId, false);
+	myFragment.setTitle(title);
+        Log.e("ERROR", "***myFragment " + myFragment);
         //Bundle args = new Bundle();
 
-        myFragment.init(url, docId);
+
         
         //args.putString("url", url);
 
@@ -63,14 +87,14 @@ public class ScreenSlidePagerAdapter extends FragmentPagerAdapter {
        this.fragments.clear(); 
        this.titles.clear();
        this.notifyDataSetChanged();
-       searchPage.updateUrl("http://13.141.43.227/docs/" + docId);
+       searchPage.updateUrl(searchUrl + docId);
     }
 
 
     @Override
     public Fragment getItem(int position) {
     	if (position == 0) {
-    		return searchPage;
+	    return searchPage;
     	}
     			
     	return this.fragments.get(position-1);

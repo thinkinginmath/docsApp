@@ -14,11 +14,16 @@ public class NavMenuItem implements NavDrawerItem {
     private NavMenuItem() {
     }
 
-    public static NavMenuItem create( int id, String label, String icon, boolean updateActionBarTitle, Context context ) {
+    public static NavMenuItem create(int id,
+				     String label,
+				     String icon,
+				     boolean updateActionBarTitle,
+				     Context context ) {
         NavMenuItem item = new NavMenuItem();
         item.setId(id);
         item.setLabel(label);
-        item.setIcon(context.getResources().getIdentifier( icon, "drawable", context.getPackageName()));
+        item.setIcon(context.getResources()
+		     .getIdentifier(icon, "drawable", context.getPackageName()));
         item.setUpdateActionBarTitle(updateActionBarTitle);
         return item;
     }

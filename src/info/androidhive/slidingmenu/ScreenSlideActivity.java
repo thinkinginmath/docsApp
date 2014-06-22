@@ -83,13 +83,6 @@ public class ScreenSlideActivity extends FragmentActivity {
     private ArrayList<HashMap<String, String>> receiptslist = new ArrayList<HashMap<String, String>>();
     private NavDrawerListAdapter adapter;
     
-    float x1, x2;
-    float y1, y2;
-	//end of for drawer
-
-    public String searchID = null;
-	
-	
     private static final String FILE_NAME = "FN";
     private static final String FILE_TYPE = "T";
     
@@ -98,16 +91,17 @@ public class ScreenSlideActivity extends FragmentActivity {
 
     private boolean jsonLoaded = false;
     
-    private final String DEFAULT_SERVER = "http://13.141.43.227";
-    
-    private String serverURL = DEFAULT_SERVER;
-    
+    private final String DEFAULT_SERVER = "13.141.43.227";
     SharedPreferences preferences = null;
     
     private String loginUrl;
     private String logoutUrl;
     private String homePageUrl;
     private String server;
+    public String searchDocId = null;
+
+    public String docImageDir = "docimages";
+    public String docImageBaseUrl;
 
     private void setServer(String server, boolean write) {
 	this.server = server;
@@ -122,6 +116,18 @@ public class ScreenSlideActivity extends FragmentActivity {
 	    editor.putString("dms.server", server);
 	    editor.commit();
 	}
+    }
+
+
+    public void updateTitle(String title, String docId) {
+	mTitle = title;
+	getActionBar().setTitle(mTitle);
+	if (searchView != null) {
+	    searchView.setQuery(docId, false);
+	}
+    }
+    private String getBaseSearchUrl() {
+	return "http://" + server + "/docs/";
     }
 
     @Override
@@ -157,9 +163,11 @@ public class ScreenSlideActivity extends FragmentActivity {
     	Log.e("test", "retriveServerURL");
     	preferences = PreferenceManager.getDefaultSharedPreferences(currentActivity);
     	server = preferences.getString("dms.server", DEFAULT_SERVER); 
-    	searchID = preferences.getString("dms.docId", "test");
-      	Log.e("test", "retriveServerURL id" + searchID);
-        
+
+    	searchDocId = preferences.getString("dms.docId", "test");
+	this.docImageDir = preferences.getString("dms.imageDir", this.docImageDir);
+	this.docImageBaseUrl = "http://" + server + "/" + this.docImageDir + "/";
+        setServer(server, false);
     }
     
     private void createDrawer()
@@ -194,9 +202,12 @@ public class ScreenSlideActivity extends FragmentActivity {
 						  R.string.app_name // nav drawer close - description for accessibility
 						  ) {
 		public void onDrawerClosed(View view) {
-		    getActionBar().setTitle(mTitle);
-		    // calling onPrepareOptionsMenu() to show action bar icons
 		    invalidateOptionsMenu();
+		    getActionBar().setTitle(mTitle);
+		    if (searchView != null) {
+			searchView.setQuery(searchDocId, false);
+		    }
+		    // calling onPrepareOptionsMenu() to show action bar icons
 		}
 
 		public void onDrawerOpened(View drawerView) {
@@ -210,24 +221,23 @@ public class ScreenSlideActivity extends FragmentActivity {
     
     private class ProgressTask extends AsyncTask<String, Void, Boolean> {
     	private ProgressDialog dialog;
-
     	private FragmentActivity activity;
-    	
-    	private String query;
+    	private JSONArray json;
+    	private String docId;
 
     	// private List<Message> messages;
-    	public ProgressTask(FragmentActivity activity, String query) {
-    		this.activity = activity;
-    		context = activity;
-    		dialog = new ProgressDialog(context);
-    		this.query = query;
+    	public ProgressTask(FragmentActivity activity, String docId) {
+	    this.activity = activity;
+	    context = activity;
+	    dialog = new ProgressDialog(context);
+	    this.docId = docId;
     	}
 
     	private Context context;
 
     	protected void onPreExecute() {
-    		this.dialog.setMessage("Progress start");
-    		//this.dialog.show();
+	    this.dialog.setMessage("Progress start");
+	    //this.dialog.show();
     	}
 
     	@Override
@@ -235,15 +245,14 @@ public class ScreenSlideActivity extends FragmentActivity {
 	    if (dialog.isShowing()) {
 		dialog.dismiss();
 	    }
+	    if (searchView != null) {
+		searchView.setQuery(searchDocId, false);
+	    }
 	    updateDrawerMenu();						 
     	}
-    	
-    	private JSONArray json;
-    	private String docId;
 
     	private void updateDrawerMenu() {
-	    adapter.addPageMenuItem(NavMenuSection.create(100,
-							  getString(R.string.menu_section_receipts)));
+	    adapter.resetPageMenuItems(getString(R.string.menu_section_receipts));
 
 	    for (int i = 0; i < json.length(); i++) {
 		try {
@@ -255,9 +264,12 @@ public class ScreenSlideActivity extends FragmentActivity {
 			+ getString(R.string.menu_item_title2)
 			+ " (" + fileType + ")";
                      
-		    mPagerAdapter.addItem(serverURL+"/docimages/" + docId + "/" + docId + "/" + c.getString("FN"),
-					  title);
-                     
+		    if (i == 0) {
+			mPagerAdapter.setSearchPageTitle(title);
+		    } else {
+			mPagerAdapter.addItem(docImageBaseUrl + docId + "/" + docId + "/" + c.getString("FN"),
+					      title);
+		    }
 		    String fileName = c.getString(FILE_NAME);
 		    Log.e("ERROR", "****fileName " + fileName);
 		    String fileID = fileName.substring(3,
@@ -276,9 +288,8 @@ public class ScreenSlideActivity extends FragmentActivity {
 
 	@Override
     	protected Boolean doInBackground(final String... args) {
-	    if (query != null) {
+	    if (docId != null) {
 		//
-		docId = query;
 		//mPagerAdapter.addItem("http://api.uubright.com/2225/pic000000.jpg",
 		//	"WebView 1");
 		JSONParser jParser = new JSONParser();
@@ -286,7 +297,7 @@ public class ScreenSlideActivity extends FragmentActivity {
 		
 		// get JSON data from URL
 		try {
-		    JSONObject jsonObj = jParser.getJSONFromUrl("http://13.141.43.227/docimages/" + docId + "/"
+		    JSONObject jsonObj = jParser.getJSONFromUrl(docImageBaseUrl + docId + "/"
 								+ docId + "/" + docId + ".json");
 		    json = jsonObj.getJSONArray("T_blog");
 					
@@ -305,38 +316,46 @@ public class ScreenSlideActivity extends FragmentActivity {
     }
     
     void processSearchDocId() {
-    if (searchID != null) {
-	      //new ProgressTask(ScreenSlideActivity.this, query).execute();
-	      mPager = (ViewPager) findViewById(R.id.pager);
-	      Log.e("ScreenSlideActivity", "**** mPager is " + mPager);
-	      if (mPagerAdapter == null) {
-		  mPagerAdapter = new ScreenSlidePagerAdapter(
-							      getSupportFragmentManager(), searchID);
-		  mPager.setAdapter(mPagerAdapter);
-		  mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-			  @Override
-			  public void onPageSelected(int position) {
-							// When changing pages, reset the action bar actions since
-							// they are dependent
-							// on which page is currently active. An alternative
-							// approach is to have each
-							// fragment expose actions itself (rather than the activity
-							// exposing actions),
-							// but for simplicity, the activity provides the actions in
-							// this sample.
-			      invalidateOptionsMenu();
-			  }
-		      });
-		  
-	      }
-				//		
-				// Add any number of items to the list of your Fragment
-
-//				mPagerAdapter.searchDoc(query);
-	      Log.e("ERROR", "***set current item");
-	      mPager.setCurrentItem(0);
-	      mPagerAdapter.searhDoc(searchID);
-	  }
+	if (searchDocId != null) {
+		
+	    //new ProgressTask(ScreenSlideActivity.this, query).execute();
+	    mPager = (ViewPager) findViewById(R.id.pager);
+	    Log.e("ScreenSlideActivity", "**** mPager is " + mPager);
+	    if (mPagerAdapter == null) {
+		mPagerAdapter = new ScreenSlidePagerAdapter
+		    (getSupportFragmentManager(), getBaseSearchUrl(), searchDocId);
+		mPager.setAdapter(mPagerAdapter);
+		mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+			@Override
+			public void onPageSelected(int position) {
+			    // When changing pages, reset the action bar actions since
+			    // they are dependent
+			    // on which page is currently active. An alternative
+			    // approach is to have each
+			    // fragment expose actions itself (rather than the activity
+			    // exposing actions),
+			    // but for simplicity, the activity provides the actions in
+			    // this sample.
+			    invalidateOptionsMenu();
+			    Log.e("ERROR", "we are at position =====>" + position);
+			    mTitle = mPagerAdapter.getTitleForPosition(position);
+			    getActionBar().setTitle(mTitle);
+			    if (searchView != null) {
+				searchView.setQuery(searchDocId, false);
+			    }
+			    Log.e("ERROR", "we are at position =====>" + position + " " + mTitle);
+			}
+		    });
+	    } else {
+		mPagerAdapter.searhDoc(searchDocId);
+	    }
+	    //		
+	    // Add any number of items to the list of your Fragment
+	    
+	    //				mPagerAdapter.searchDoc(query);
+	    Log.e("ERROR", "***set current item");
+	    mPager.setCurrentItem(0);
+	}
     }
     
     @Override
@@ -360,46 +379,48 @@ public class ScreenSlideActivity extends FragmentActivity {
 
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-         if(null!=searchManager ) {   
-           searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-          }
-      searchView.setIconifiedByDefault(false);
+	if(null!=searchManager ) {   
+	    searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+	}
+	searchView.setIconifiedByDefault(false);
 
         //search box
         //Keep a global variable of this so you can set it within the next listener
         //SearchView receipt_search = (SearchView) search.getActionView();
     	
-      searchView.setOnQueryTextListener(new OnQueryTextListener() {
-	      @Override
-	      public boolean onQueryTextSubmit(String query) {
-		  searchView.clearFocus();
-		  InputMethodManager in = (InputMethodManager)currentActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
-		  in.hideSoftInputFromWindow( searchView.getWindowToken(), 0);
+	searchView.setOnQueryTextListener(new OnQueryTextListener() {
+		@Override
+		public boolean onQueryTextSubmit(String query) {
+		    searchView.clearFocus();
+		    InputMethodManager in = (InputMethodManager)currentActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+		    in.hideSoftInputFromWindow( searchView.getWindowToken(), 0);
 			    
-		  jsonLoaded = false;		
+		    jsonLoaded = false;		
 
-		  searchID = query;
-		  Log.e("searchID", "**** searchID is " + searchID);
-		  processSearchDocId();
-		  return true;
-	      }
+		    searchDocId = query;
+		    Log.e("searchID", "**** searchID is " + searchDocId);
+		    processSearchDocId();
+		    return true;
+		}
 
-	      // @Override
-	      public boolean onQueryTextChange(String text) {
-		  return true;
-	      }
-	  });
+		// @Override
+		public boolean onQueryTextChange(String text) {
+		    return true;
+		}
+	    });
         
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-    	if (searchID == null)
-    		return false;
+    	if (searchDocId == null) {
+	    return false;
+	}
     	if (mDrawerToggle.onOptionsItemSelected(item)) {
 	    return true;
     	}
+
     	Log.e("ERROR", "**** touched home1");
         switch (item.getItemId()) {
 	case android.R.id.home:
@@ -437,8 +458,9 @@ public class ScreenSlideActivity extends FragmentActivity {
 	// Currently selected river
 	//mTitle = menuItems[position];
 	
-	if (mPager != null) {
-	    mPager.setCurrentItem(position);
+	int itemId = item.getId();
+	if (mPager != null && itemId < 10000) {
+	    mPager.setCurrentItem(itemId);
 	}
 	// Creating a fragment object
 	
@@ -446,6 +468,8 @@ public class ScreenSlideActivity extends FragmentActivity {
 	mDrawerList.setItemChecked(position, true);
 	mDrawerList.setSelection(position);
 	if (item != null) {
+	    mTitle = item.getLabel();
+	    getActionBar().setTitle(item.getLabel());
 	    setTitle(item.getLabel());
 	}
 	mDrawerLayout.closeDrawer(mDrawerList);
@@ -458,54 +482,59 @@ public class ScreenSlideActivity extends FragmentActivity {
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 				long id) {
-
 	    NavDrawerItem item = adapter.getNthItem(position);
 
 	    if (item == null) {
 		return;
 	    }
-	    String itemLabel = item.getLabel();
+
+	    int menuId = item.getId();
 
 	    // display view for selected nav drawer item
-	    Log.e("EEEOR", "*** postion is " +position + "view:" + itemLabel);
+	    Log.e("EEEOR", "*** postion is " +position + "view:" + id);
 
 	    //Log.e("EEEOR", "*** postion object is " + t);
-	    if (position == 1){
+	    if (menuId == 100003){
 	    	// Set an EditText view to get user input 
 	    	final EditText input = new EditText(currentActivity);
-            input.setText(serverURL);
+		input.setText(server);
 	    	new AlertDialog.Builder(currentActivity)
 	    	    .setTitle(R.string.menu_item_setting)
 	    	    .setMessage(getString(R.string.menu_item_server))
 	    	    .setView(input)
-	    	    .setPositiveButton(getString(R.string.menu_item_ok), new DialogInterface.OnClickListener() {
-	    	         public void onClick(DialogInterface dialog, int whichButton) {
-	    	        	 serverURL  = input.getText().toString(); 
-	    	        	 Log.e("ERROR", "*** serverURL " + serverURL);
-	    	        	 SharedPreferences.Editor editor = preferences.edit();
-	    	        	 editor.putString("serverURL", serverURL); // value to store
-	    	        	 editor.commit();
-	    	             // deal with the editable
-	    	         }
-	    	    })
-	    	    .setNegativeButton(getString(R.string.menu_item_cancel), new DialogInterface.OnClickListener() {
-	    	         public void onClick(DialogInterface dialog, int whichButton) {
-	    	                // Do nothing.
-	    	         }
-	    	    }).show();
+	    	    .setPositiveButton(getString(R.string.menu_item_ok),
+				       new DialogInterface.OnClickListener() {
+					   public void onClick(DialogInterface dialog, int whichButton) {
+					       server  = input.getText().toString(); 
+					       Log.e("ERROR", "*** server " + server);
+					       SharedPreferences.Editor editor = preferences.edit();
+					       editor.putString("dms.server", server); // value to store
+					       editor.commit();
+					       // deal with the editable
+					   }
+				       })
+	    	    .setNegativeButton(getString(R.string.menu_item_cancel),
+				       new DialogInterface.OnClickListener() {
+					   public void onClick(DialogInterface dialog, int whichButton) {
+					       // Do nothing.
+					   }
+				       }).show();
 		
-	    }
-	    if (position == 2){
-	    	
+	    } else if (menuId == 100004 || menuId == 100002 ) {
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ScreenSlideActivity.this);
+		SharedPreferences.Editor editor = preferences.edit();
+
+		if (menuId == 100002) {
+		    editor.putString("dms.intent", "homepage");		
+		} else {
+		    editor.putString("dms.intent", "logout");		
+		}
+		editor.commit();
 		NavUtils.navigateUpTo(currentActivity,
 				      new Intent(view.getContext(), LoginActivity.class));
-		    
-		
+	    } else {
+		displayView(position);
 	    }
-	    else {
-		    displayView(position);
-	    }
-	    
 	}
     }
 }

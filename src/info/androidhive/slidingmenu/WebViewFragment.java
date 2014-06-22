@@ -18,32 +18,36 @@ import info.androidhive.slidingmenu.R;
 
 
 public class WebViewFragment extends Fragment {
-	
-	float x1, x2;
-	float y1, y2;
-	WebView webView;
-	
+    float x1, x2;
+    float y1, y2;
+    WebView webView;
+    String title;
     String docId;
     private String currentURL;
+    private  boolean isSearchPage;
     
-    public void init(String url, String docId) {
+    public void init(String url, String docId, boolean isSearch) {
         currentURL = url;
-	this.docId = docId;
+	    this.docId = docId;
+	    isSearchPage = isSearch;
     }
     
+    public void setTitle(String title) {
+	this.title = title;
+    }
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {        
         super.onActivityCreated(savedInstanceState);
     }
 
-    
-   public void updateUrl(String url) {
-        Log.d("SwA", "Update URL ["+url+"] - View ["+getView()+"]");
-        currentURL = url;
-
-        if (webView!= null)
-        	webView.loadUrl(url);
-		
+    public void updateUrl(String url) {
+       Log.d("SwA", "Update URL ["+url+"] - View ["+getView()+"]");
+       currentURL = url;
+       
+       if (webView!= null) {
+	   webView.loadUrl(url);
+       }
     }
     
 	
@@ -78,42 +82,44 @@ public class WebViewFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		
-		Log.e("Error", "*** in WebViewFragment");
-		// Retrieving the currently selected item number
-		//int position = getArguments().getInt("position");
-		
-		//Log.e("Error", "*** position " + position);
-		// List of rivers
-		//String[] menus = getResources().getStringArray(R.array.menus);
-		//String[] menus = getMenus();
-
-		// Creating view corresponding to the fragment
-		View view = inflater.inflate(R.layout.fragment_layout, container, false);
-
-		// Updating the action bar title
-		//getActivity().getActionBar().setTitle(menus[position]);
-		
-		//Initializing and loading url in webview
-		webView = (WebView)view.findViewById(R.id.webView); 
-		webView.setWebViewClient(new MyBrowser());
-		webView.loadUrl(currentURL);
-		// webView.setOnTouchListener(onTouchListener);
-		WebSettings settings = webView.getSettings();
+	    Log.e("Error", "*** in WebViewFragment");
+	    // Retrieving the currently selected item number
+	    //int position = getArguments().getInt("position");
+	    
+	    //Log.e("Error", "*** position " + position);
+	    // List of rivers
+	    //String[] menus = getResources().getStringArray(R.array.menus);
+	    //String[] menus = getMenus();
+	    
+	    // Creating view corresponding to the fragment
+	    View view = inflater.inflate(R.layout.fragment_layout, container, false);
+	    
+	    // Updating the action bar title
+	    //getActivity().getActionBar().setTitle(menus[position]);
+	    
+	    //Initializing and loading url in webview
+	    webView = (WebView)view.findViewById(R.id.webView); 
+	    webView.setWebViewClient(new MyBrowser());
+	    webView.loadUrl(currentURL);
+	    // webView.setOnTouchListener(onTouchListener);
+	    WebSettings settings = webView.getSettings();
+	    //if (isSearchPage==false) {
 		settings.setLoadWithOverviewMode(true);
 		settings.setUseWideViewPort(true);
-		settings.setMinimumFontSize(40);
-		settings.setJavaScriptEnabled(true);
-		settings.setSupportZoom(true);
-		settings.setBuiltInZoomControls(true);
-		webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
-		webView.setScrollbarFadingEnabled(true);
-		// settings.setAppCacheMaxSize(8*1024*1024);
-		settings.setAppCachePath("/data/data/com.your.package.appname/cache");
-				settings.setAppCacheEnabled(true);
-		 		settings.setCacheMode(WebSettings.LOAD_DEFAULT);
+		settings.setMinimumFontSize(32);
+	    //}
+	    settings.setJavaScriptEnabled(true);
+	    settings.setSupportZoom(true);
+	    settings.setBuiltInZoomControls(true);
+	    webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
+	    webView.setScrollbarFadingEnabled(true);
+	    // settings.setAppCacheMaxSize(8*1024*1024);
+	    settings.setAppCachePath("/data/data/docsApp/cache");
+	    settings.setAppCacheEnabled(true);
+	    settings.setCacheMode(WebSettings.LOAD_DEFAULT);
 	    webView.setWebViewClient(new WebViewClient() {      
             //ProgressDialog progressDialog;
-          
+		    
             //If you will not use this method url links are opeen in new brower not in webview
             /*public boolean shouldOverrideUrlLoading(WebView view, String url) {              
                 view.loadUrl(url);
@@ -125,28 +131,36 @@ public class WebViewFragment extends Fragment {
             public void onLoadResource (WebView view, String url) {
             }*/
             
-            @Override
-            public void onPageFinished(WebView view, String url) {
+	    @Override
+	    public void onPageFinished(WebView view, String url) {
             	ScreenSlideActivity sa = (ScreenSlideActivity) WebViewFragment.this.getActivity();
+		
+		Log.e("ERROR", "**** ===========WebViewFragment on Page finished Doc found");
+
+
+		//sa.updateTitle(title, docId);
+		if (isSearchPage == false) {
+		    Log.e("ERROR", "**** ===========");
+		    Log.e("ERROR", "**** ===========");
+		    Log.e("ERROR", "**** ===========");
+		    return;
+		}
 
             	int pos = url.indexOf("/docimages/");
                 if (pos != -1) {
-                	Log.e("ERROR", "**** Doc found");
-                	// Load JSON file.
-                	//String uri = url.substring(pos + 11);
-                	Log.e("ERROR", "********** trying to load json  " + docId);
-                	//String docId = uri.substring(0, uri.indexOf("/"));
-                	//Log.e("ERROR", "the loaded DOCID is " + docId);
-                	sa.loadDocumentJson(docId);
+		    Log.e("ERROR", "**** Doc found");
+		    // Load JSON file.
+		    //String uri = url.substring(pos + 11);
+		    Log.e("ERROR", "********** trying to load json  " + docId);
+		    //String docId = uri.substring(0, uri.indexOf("/"));
+		    //Log.e("ERROR", "the loaded DOCID is " + docId);
+		    sa.loadDocumentJson(docId);
                 } else {
-                	Log.e("ERROR", "**** Doc not found");
-                	sa.cleanup();
+		    Log.e("ERROR", "**** Doc not found");
+		    sa.cleanup();
                 }
             }
-             
         }); 
-      
-       
 
        /* webView.setOnTouchListener(new View.OnTouchListener() {
         	//final WebView webview = webView;
@@ -187,21 +201,18 @@ public class WebViewFragment extends Fragment {
 
     //here the rest of your code
 
-    return view;
+	    return view;
 	}
 	
-	private class MyBrowser extends WebViewClient {
-
-		@Override
-		public boolean shouldOverrideUrlLoading(WebView view, String url) {
-
-			view.loadUrl(url);
-
-			return true;
-
-		}
-
-	}
+    private class MyBrowser extends WebViewClient {
 	
-
+	@Override
+	    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+	    
+	    view.loadUrl(url);
+	    
+	    return true;
+	    
+	}
+    }
 }

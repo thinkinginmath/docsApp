@@ -31,7 +31,7 @@ public class LoginActivity extends Activity {
 	this.server = server;
 	String urlBase = "http://" + server;
 	loginUrl = urlBase + "/m/login.html";
-	logoutUrl = urlBase + "/m/logout";
+	logoutUrl = urlBase + "/users/logout?mobile=pad";
 	homePageUrl = urlBase + "/pad/pad.html";
 
 	if (write) {
@@ -64,7 +64,7 @@ public class LoginActivity extends Activity {
     public void onResume() {
     	SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
     	String server = preferences.getString("dms.server", "13.141.43.227" ); 
-    	String reason = preferences.getString("dms.intent", "home");
+    	String reason = preferences.getString("dms.intent", "login");
 	
         Log.e("ERROR", "***onResuem gets called");
         // put your code here...
@@ -143,7 +143,7 @@ public class LoginActivity extends Activity {
 			if (docLoaded) {
 			    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
 			    SharedPreferences.Editor editor = preferences.edit();
-			    editor.putString("dms.imageDir", url);
+			    editor.putString("dms.imageDir", imageDir);
 			    editor.putString("dms.docId", docId);
 			    editor.commit();
 			    startActivity(new Intent(LoginActivity.this, ScreenSlideActivity.class));
